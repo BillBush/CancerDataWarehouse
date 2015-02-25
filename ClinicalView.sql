@@ -53,9 +53,13 @@ tblnte_days_to_new_tumor_event_after_initial_treatment_valuecolumn,
 tblnte_new_neoplasm_event_occurrence_anatomic_site_valuecolumn,
 tblnte_new_neoplasm_event_type_valuecolumn,
 tblnte_new_tumor_event_additional_surgery_procedure_valuecolumn,
-tblnte_new_tumor_event_after_initial_treatment_valuecolumn
+tblnte_new_tumor_event_after_initial_treatment_valuecolumn,
+tblrx_bcr_drug_uuid_valuecolumn,
+tblrx_total_dose_valuecolumn,
+tblrx_total_dose_units_valuecolumn,
+tblrx_number_cycles_valuecolumn,
+tblrx_days_to_drug_therapy_start_valuecolumn
 
---should tblnte (new tumor event) be added to view?
 
 FROM tblbrca_breast_cancer_surgery_margin_status 
 	LEFT JOIN tblbrca_axillary_lymph_node_stage_method_type
@@ -182,3 +186,17 @@ FROM tblbrca_breast_cancer_surgery_margin_status
 		ON tblbrca_nte_new_tumor_event.tblbrca_nte_new_tumor_event_id_key=tblnte_new_tumor_event_additional_surgery_procedure.tblbrca_nte_new_tumor_event_id_key
 	LEFT JOIN tblnte_new_tumor_event_after_initial_treatment
 		ON tblfollow_up_V2_1_follow_up.tblfollow_up_V2_1_follow_up_id_key=tblnte_new_tumor_event_after_initial_treatment.tblfollow_up_V2_1_follow_up_id_key
+	LEFT JOIN tblrx_drugs
+		ON tblbrca_breast_cancer_surgery_margin_status.tblbrca_patient_id_key=tblrx_drugs.tblbrca_patient_id_key
+	LEFT JOIN tblrx_drug
+		ON tblrx_drugs.tblrx_drugs_id_key=tblrx_drug.tblrx_drugs_id_key
+	LEFT JOIN tblrx_bcr_drug_uuid 
+		ON tblrx_drug.tblrx_drug_id_key = tblrx_bcr_drug_uuid.tblrx_drug_id_key
+	LEFT JOIN tblrx_total_dose 
+		ON tblrx_total_dose.tblrx_drug_id_key = tblrx_bcr_drug_uuid.tblrx_drug_id_key
+	LEFT JOIN tblrx_total_dose_units 
+		ON tblrx_total_dose_units.tblrx_drug_id_key = tblrx_bcr_drug_uuid.tblrx_drug_id_key
+	LEFT JOIN tblrx_number_cycles 
+		ON tblrx_number_cycles.tblrx_drug_id_key = tblrx_bcr_drug_uuid.tblrx_drug_id_key
+	LEFT JOIN tblrx_days_to_drug_therapy_start 
+		ON tblrx_days_to_drug_therapy_start.tblrx_drug_id_key = tblrx_bcr_drug_uuid.tblrx_drug_id_key
