@@ -1,4 +1,5 @@
 ﻿
+CREATE OR REPLACE VIEW vwSample AS 
 SELECT vw_patient_sample_mutation.patient_id AS patient_id,vw_patient_sample_mutation.mutation_set_id AS mutation_set_id,
 vw_patient_sample_mutation.sample_id AS sample_id,tblbio_sample_type_valuecolumn AS sample_value_column,tblbio_sample_type_id_valuecolumn AS sample_type_id,
 tblbio_initial_weight_valuecolumn AS initial_weight,tblbio_percent_lymphocyte_infiltration_valuecolumn AS percent_lymphocyte_infiltration,
@@ -47,11 +48,3 @@ LEFT OUTER JOIN tblbio_percent_tumor_cells ON (tblbio_slide.tblbio_slide_id_key=
 LEFT OUTER JOIN tblbio_percent_tumor_nuclei ON (tblbio_slide.tblbio_slide_id_key=tblbio_percent_tumor_nuclei.tblbio_slide_id_key)
 LEFT OUTER JOIN tblbio_section_location ON (tblbio_slide.tblbio_slide_id_key=tblbio_section_location.tblbio_slide_id_key)
 LEFT OUTER JOIN tblbio_weight ON (tblbio_portion.tblbio_portion_id_key=tblbio_weight.tblbio_portion_id_key)
-/*RIGHT OUTER JOIN*/
-
-
-
-
-
-/*SELECT * FROM tblbio_plate_column
-LIMIT 10*/
