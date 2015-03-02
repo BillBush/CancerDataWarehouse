@@ -6,10 +6,11 @@ AND trim(both ' ' from tblparticipant_id.tblparticipant_id_valuecolumn) = trim(b
 LIMIT 1
 $$ LANGUAGE SQL;
 
+DROP VIEW vwPatient;
 CREATE OR REPLACE VIEW vwPatient AS
 SELECT
 tblshared_bcr_patient_uuid.tblbrca_patient_id_key,
-tblparticipant_id.tblparticipant_id_valuecolumn,
+tblshared_bcr_patient_uuid.tblshared_bcr_patient_uuid_valuecolumn,
 tblshared_prior_dx.tblshared_prior_dx_valuecolumn,
 tblshared_gender.tblshared_gender_valuecolumn,
 tblshared_days_to_birth.tblshared_days_to_birth_valuecolumn,
@@ -21,37 +22,35 @@ tbladmin_day_of_dcc_upload.tbladmin_day_of_dcc_upload_valuecolumn,
 tbladmin_month_of_dcc_upload.tbladmin_month_of_dcc_upload_valuecolumn,
 tbladmin_year_of_dcc_upload.tbladmin_year_of_dcc_upload_valuecolumn
 FROM
-tblparticipant_id
-JOIN tblshared_bcr_patient_uuid 
-	ON tblparticipant_id.tblparticipant_id_valuecolumn
-	= tblshared_bcr_patient_uuid.tblshared_bcr_patient_uuid_valuecolumn
-	AND tblshared_bcr_patient_uuid.tblbrca_patient_id_key 
-	= fnGetPatInfo(tblparticipant_id.tblparticipant_id_valuecolumn)
+tblshared_bcr_patient_uuid
 JOIN tblbrca_patient 
-	ON tblbrca_patient.tblbrca_patient_id_key = tblshared_bcr_patient_uuid.tblbrca_patient_id_key
-JOIN tblshared_prior_dx 
+	ON tblshared_bcr_patient_uuid.tblbrca_patient_id_key 
+	= fnGetPatInfo(tblshared_bcr_patient_uuid.tblshared_bcr_patient_uuid_valuecolumn)
+	AND tblbrca_patient.tblbrca_patient_id_key = tblshared_bcr_patient_uuid.tblbrca_patient_id_key
+LEFT OUTER JOIN tblshared_prior_dx 
 	ON tblshared_prior_dx.tblbrca_patient_id_key = tblbrca_patient.tblbrca_patient_id_key
-JOIN tblshared_gender 
+LEFT OUTER JOIN tblshared_gender 
 	ON tblshared_gender.tblbrca_patient_id_key = tblbrca_patient.tblbrca_patient_id_key
-JOIN tblshared_days_to_birth 
+LEFT OUTER JOIN tblshared_days_to_birth 
 	ON tblshared_days_to_birth.tblbrca_patient_id_key = tblbrca_patient.tblbrca_patient_id_key
-JOIN tblshared_history_of_neoadjuvant_treatment 
+LEFT OUTER JOIN tblshared_history_of_neoadjuvant_treatment 
 	ON tblshared_history_of_neoadjuvant_treatment.tblbrca_patient_id_key 
 	= tblbrca_patient.tblbrca_patient_id_key 
-JOIN tblshared_race 
+LEFT OUTER JOIN tblshared_race 
 	ON tblshared_race.tblbrca_patient_id_key = tblbrca_patient.tblbrca_patient_id_key 
-JOIN tblshared_year_of_initial_pathologic_diagnosis 
+LEFT OUTER JOIN tblshared_year_of_initial_pathologic_diagnosis 
 	ON tblshared_year_of_initial_pathologic_diagnosis.tblbrca_patient_id_key 
 	= tblbrca_patient.tblbrca_patient_id_key 
-JOIN tblshared_ethnicity 
+LEFT OUTER JOIN tblshared_ethnicity 
 	ON tblshared_ethnicity.tblbrca_patient_id_key = tblbrca_patient.tblbrca_patient_id_key
-JOIN tblbrca_tcga_bcr 
+LEFT OUTER JOIN tblbrca_tcga_bcr 
 	ON tblbrca_patient.tblbrca_tcga_bcr_id_key = tblbrca_tcga_bcr.tblbrca_tcga_bcr_id_key
-JOIN tbladmin_admin 
+LEFT OUTER JOIN tbladmin_admin 
 	ON tbladmin_admin.tblbrca_tcga_bcr_id_key = tblbrca_tcga_bcr.tblbrca_tcga_bcr_id_key
-JOIN tbladmin_day_of_dcc_upload 
+LEFT OUTER JOIN tbladmin_day_of_dcc_upload 
 	ON tbladmin_day_of_dcc_upload.tbladmin_admin_id_key = tbladmin_admin.tbladmin_admin_id_key
-JOIN tbladmin_month_of_dcc_upload 
+LEFT OUTER JOIN tbladmin_month_of_dcc_upload 
 	ON tbladmin_month_of_dcc_upload.tbladmin_admin_id_key = tbladmin_admin.tbladmin_admin_id_key
-JOIN tbladmin_year_of_dcc_upload 
+LEFT OUTER JOIN tbladmin_year_of_dcc_upload 
 	ON tbladmin_year_of_dcc_upload.tbladmin_admin_id_key = tbladmin_admin.tbladmin_admin_id_key;
+--LIMIT 5

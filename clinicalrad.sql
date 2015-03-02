@@ -46,5 +46,4 @@ LEFT JOIN tblshared_day_of_form_completion
 LEFT JOIN tblshared_month_of_form_completion
 	ON tblrad_radiation.tblrad_radiation_id_key = tblshared_month_of_form_completion.tblrad_radiation_id_key
 LEFT JOIN tblshared_year_of_form_completion
-	ON tblrad_radiation.tblrad_radiation_id_key = tblshared_year_of_form_completion.tblrad_radiation_id_key
-LIMIT 5
+	ON tblrad_radiation.tblrad_radiation_id_key = tblshared_year_of_form_completion.tblrad_radiation_id_key;

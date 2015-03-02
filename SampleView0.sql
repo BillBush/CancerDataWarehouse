@@ -1,7 +1,11 @@
-﻿CREATE OR REPLACE VIEW vwSample AS 
-SELECT tblshared_bcr_patient_uuid.tblshared_bcr_patient_uuid_valuecolumn,
-tblbio_bcr_sample_uuid.tblbio_bcr_sample_uuid_valuecolumn,
-tblbio_sample_type_valuecolumn AS sample_value_column,
+﻿DROP VIEW vwSample;
+CREATE OR REPLACE VIEW vwSample AS 
+SELECT tblshared_bcr_patient_uuid_valuecolumn AS patient_uuid,
+tblbio_bcr_sample_uuid_valuecolumn AS sample_uuid,
+to_date(concat(tblbio_year_of_creation.tblbio_year_of_creation_valuecolumn,
+	to_char(tblbio_month_of_creation.tblbio_month_of_creation_valuecolumn, '09'),
+	to_char(tblbio_day_of_creation.tblbio_day_of_creation_valuecolumn, '09')), 'YYYY MM DD') AS collection_date,
+tblbio_sample_type_valuecolumn AS sample_type,
 tblbio_sample_type_id_valuecolumn AS sample_type_id,
 tblbio_initial_weight_valuecolumn AS initial_weight,
 tblbio_percent_lymphocyte_infiltration_valuecolumn AS percent_lymphocyte_infiltration,
@@ -13,12 +17,7 @@ tblbio_percent_stromal_cells_valuecolumn AS percent_stromal_cells,
 tblbio_percent_tumor_cells_valuecolumn AS percent_tumor_cells,
 tblbio_percent_tumor_nuclei_valuecolumn AS percent_tumor_nuclei,
 tblbio_section_location_valuecolumn AS section_location,
-tblbio_weight_valuecolumn AS tblbio_weight,
-tblbio_days_to_collection.tblbio_days_to_collection_valuecolumn,
-tblbio_day_of_creation.tblbio_day_of_creation_valuecolumn,
-tblbio_month_of_creation.tblbio_month_of_creation_valuecolumn,
-tblbio_year_of_creation.tblbio_year_of_creation_valuecolumn
-
+tblbio_weight_valuecolumn AS tblbio_weight
 FROM 
 tblbio_patient
 LEFT OUTER JOIN tblshared_bcr_patient_uuid
@@ -71,3 +70,4 @@ LEFT OUTER JOIN tblbio_month_of_creation
 	ON tblbio_month_of_creation.tblbio_portion_id_key = tblbio_portion.tblbio_portion_id_key
 LEFT OUTER JOIN tblbio_year_of_creation 
 	ON tblbio_year_of_creation.tblbio_portion_id_key = tblbio_portion.tblbio_portion_id_key
+--LIMIT 5
