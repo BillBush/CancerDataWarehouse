@@ -1,9 +1,10 @@
-﻿CREATE OR REPLACE VIEW vwClinicalMisc AS 
+﻿--DROP VIEW vwClinicalMisc;
+CREATE OR REPLACE VIEW vwClinicalMisc AS 
 SELECT 
 tblshared_bcr_patient_uuid.tblshared_bcr_patient_uuid_valuecolumn,
-tblshared_day_of_form_completion.tblshared_day_of_form_completion_valuecolumn,
-tblshared_month_of_form_completion.tblshared_month_of_form_completion_valuecolumn,
-tblshared_year_of_form_completion.tblshared_year_of_form_completion_valuecolumn,
+to_date(concat(tblshared_year_of_form_completion_valuecolumn,
+	to_char(tblshared_month_of_form_completion_valuecolumn, '09'),
+	to_char(tblshared_day_of_form_completion_valuecolumn, '09')), 'YYYY MM DD') AS form_complete_date,
 tblshared_stage_system_version_valuecolumn,
 tblshared_stage_pathologic_stage_valuecolumn,
 tblshared_stage_pathologic_t_valuecolumn,
