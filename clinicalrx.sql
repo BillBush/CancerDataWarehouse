@@ -2,9 +2,9 @@
 CREATE OR REPLACE VIEW vwClinicalRx AS 
 SELECT 
 mainview.tblshared_bcr_patient_uuid_valuecolumn AS patient_uuid,
+(mainview.form_complete_date + CAST(mainview.tblrx_days_to_drug_therapy_start_valuecolumn AS INT)) AS drug_therapy_start_date,
+(mainview.form_complete_date + CAST(mainview.tblrx_days_to_drug_therapy_end_valuecolumn AS INT)) AS drug_therapy_stop_date, 
 mainview.tblrx_drug_name_valuecolumn AS drug_name,
-(mainview.form_complete_date + CAST(mainview.tblrx_days_to_drug_therapy_start_valuecolumn AS INT)) AS therapy_start_date,
-(mainview.form_complete_date + CAST(mainview.tblrx_days_to_drug_therapy_end_valuecolumn AS INT)) AS therapy_stop_date, 
 mainview.tblrx_bcr_drug_uuid_valuecolumn AS drug_uuid
 FROM
 (SELECT

@@ -1,15 +1,28 @@
-﻿CREATE OR REPLACE VIEW vwClinicalRad AS 
-SELECT
+﻿--DROP VIEW vwClinicalRad;
+CREATE OR REPLACE VIEW vwClinicalRad AS 
+SELECT 
+tblshared_bcr_patient_uuid_valuecolumn AS patient_uuid,
+(mainview.form_complete_date + CAST(mainview.tblrad_days_to_radiation_therapy_start_valuecolumn AS INT)) AS rad_therapy_start_date,
+(mainview.form_complete_date + CAST(mainview.tblrad_days_to_radiation_therapy_end_valuecolumn AS INT)) AS rad_therapy_stop_date,
+tblrad_radiation_type_valuecolumn AS rad_type,
+tblrad_radiation_dosage_valuecolumn AS rad_dosage,
+tblrad_units_valuecolumn AS rad_units,
+tblrad_numfractions_valuecolumn AS rad_numfractions,
+tblrad_course_number_valuecolumn AS rad_course_number,
+tblrad_bcr_radiation_uuid_valuecolumn AS rad_uuid,
+tblrad_radiation_treatment_ongoing_valuecolumn AS rad_ongoing 
+FROM
+(SELECT
 tblshared_bcr_patient_uuid.tblshared_bcr_patient_uuid_valuecolumn,
-tblshared_day_of_form_completion.tblshared_day_of_form_completion_valuecolumn,
-tblshared_month_of_form_completion.tblshared_month_of_form_completion_valuecolumn,
-tblshared_year_of_form_completion.tblshared_year_of_form_completion_valuecolumn,
+to_date(concat(tblshared_year_of_form_completion_valuecolumn,
+	to_char(tblshared_month_of_form_completion_valuecolumn, '09'),
+	to_char(tblshared_day_of_form_completion_valuecolumn, '09')), 'YYYY MM DD') AS form_complete_date,
 tblrad_anatomic_treatment_site_valuecolumn,
 tblrad_bcr_radiation_uuid_valuecolumn,
 tblrad_course_number_valuecolumn,
-tblrad_days_to_radiation_therapy_start_valuecolumn AS tblrad_days_to_radiation_therapy_start_iffy,
-tblrad_days_to_radiation_therapy_end_valuecolumn AS tblrad_days_to_radiation_therapy_end_iffy,
-tblrad_numfractions_valuecolumn AS tblrad_numfractions_iffy, --the quantity of tot radiation therapy fractions.
+tblrad_days_to_radiation_therapy_start_valuecolumn, --iffy
+tblrad_days_to_radiation_therapy_end_valuecolumn, --iffy
+tblrad_numfractions_valuecolumn, --iffy --the quantity of tot radiation therapy fractions.
 tblrad_radiation_dosage_valuecolumn,
 tblrad_radiation_treatment_ongoing_valuecolumn,
 tblrad_radiation_type_valuecolumn,
@@ -46,4 +59,7 @@ LEFT JOIN tblshared_day_of_form_completion
 LEFT JOIN tblshared_month_of_form_completion
 	ON tblrad_radiation.tblrad_radiation_id_key = tblshared_month_of_form_completion.tblrad_radiation_id_key
 LEFT JOIN tblshared_year_of_form_completion
-	ON tblrad_radiation.tblrad_radiation_id_key = tblshared_year_of_form_completion.tblrad_radiation_id_key;
+	ON tblrad_radiation.tblrad_radiation_id_key = tblshared_year_of_form_completion.tblrad_radiation_id_key)
+AS mainview
+--LIMIT 5
+;
