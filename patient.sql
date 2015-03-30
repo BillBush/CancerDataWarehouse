@@ -1,56 +1,55 @@
-﻿CREATE OR REPLACE FUNCTION fnGetPatInfo(patuuid character varying) RETURNS integer AS $$
+﻿/*
+CREATE OR REPLACE FUNCTION fnGetPatInfo(patuuid character varying) RETURNS integer AS $$
 SELECT tblbrca_patient_id_key
 FROM tblshared_bcr_patient_uuid
 JOIN tblparticipant_id ON tblparticipant_id.tblparticipant_id_valuecolumn = tblshared_bcr_patient_uuid.tblshared_bcr_patient_uuid_valuecolumn
 AND trim(both ' ' from tblparticipant_id.tblparticipant_id_valuecolumn) = trim(both ' ' from $1)
 LIMIT 1
 $$ LANGUAGE SQL;
-
+*/
 DROP VIEW vwPatient;
 CREATE OR REPLACE VIEW vwPatient AS
+
 SELECT
-tblshared_bcr_patient_uuid.tblbrca_patient_id_key,
-tblshared_bcr_patient_uuid.tblshared_bcr_patient_uuid_valuecolumn,
-tblshared_prior_dx.tblshared_prior_dx_valuecolumn,
-tblshared_gender.tblshared_gender_valuecolumn,
-tblshared_days_to_birth.tblshared_days_to_birth_valuecolumn,
-tblshared_history_of_neoadjuvant_treatment.tblshared_history_of_neoadjuvant_treatment_valuecolumn,
-tblshared_race.tblshared_race_valuecolumn, 
-tblshared_year_of_initial_pathologic_diagnosis.tblshared_year_of_initial_pathologic_diagnosis_valuecolumn,
-tblshared_ethnicity.tblshared_ethnicity_valuecolumn,
-tbladmin_day_of_dcc_upload.tbladmin_day_of_dcc_upload_valuecolumn,
-tbladmin_month_of_dcc_upload.tbladmin_month_of_dcc_upload_valuecolumn,
-tbladmin_year_of_dcc_upload.tbladmin_year_of_dcc_upload_valuecolumn
+tblshared_bcr_patient_uuid_valuecolumn AS pat_uuid,
+(tblshared_year_of_initial_pathologic_diagnosis_valuecolumn 
+- tblshared_age_at_initial_pathologic_diagnosis_valuecolumn) AS pat_birth_yr,
+tblshared_gender.tblshared_gender_valuecolumn AS pat_sex,
+(CASE WHEN tblshared_race_valuecolumn IS NULL OR TRIM(BOTH ' ' FROM tblshared_race_valuecolumn) = '' THEN tblshared_ethnicity_valuecolumn ELSE tblshared_race_valuecolumn END) AS pat_race,
+tblshared_year_of_initial_pathologic_diagnosis_valuecolumn AS pat_initial_dx_yr,
+tblshared_prior_dx_valuecolumn AS pat_pior_dx,
+tblshared_history_of_neoadjuvant_treatment_valuecolumn AS pat_history_of_neoadjuvant_treatment,
+tblshared_vital_status_valuecolumn AS pat_vital_status,
+(tblshared_year_of_initial_pathologic_diagnosis_valuecolumn + (tblshared_days_to_death_valuecolumn / 365)) AS pat_death_yr
 FROM
 tblshared_bcr_patient_uuid
-JOIN tblbrca_patient 
+JOIN tblbrca_patient
 	ON tblshared_bcr_patient_uuid.tblbrca_patient_id_key 
 	= fnGetPatInfo(tblshared_bcr_patient_uuid.tblshared_bcr_patient_uuid_valuecolumn)
 	AND tblbrca_patient.tblbrca_patient_id_key = tblshared_bcr_patient_uuid.tblbrca_patient_id_key
-LEFT OUTER JOIN tblshared_prior_dx 
+	--AND tblbrca_patient.tblbrca_patient_id_key = tblshared_bcr_patient_uuid.tblbrca_patient_id_key
+LEFT JOIN tblshared_prior_dx 
 	ON tblshared_prior_dx.tblbrca_patient_id_key = tblbrca_patient.tblbrca_patient_id_key
-LEFT OUTER JOIN tblshared_gender 
+LEFT JOIN tblshared_gender 
 	ON tblshared_gender.tblbrca_patient_id_key = tblbrca_patient.tblbrca_patient_id_key
-LEFT OUTER JOIN tblshared_days_to_birth 
-	ON tblshared_days_to_birth.tblbrca_patient_id_key = tblbrca_patient.tblbrca_patient_id_key
-LEFT OUTER JOIN tblshared_history_of_neoadjuvant_treatment 
+LEFT JOIN tblshared_history_of_neoadjuvant_treatment 
 	ON tblshared_history_of_neoadjuvant_treatment.tblbrca_patient_id_key 
 	= tblbrca_patient.tblbrca_patient_id_key 
-LEFT OUTER JOIN tblshared_race 
+LEFT JOIN tblshared_race 
 	ON tblshared_race.tblbrca_patient_id_key = tblbrca_patient.tblbrca_patient_id_key 
-LEFT OUTER JOIN tblshared_year_of_initial_pathologic_diagnosis 
+LEFT JOIN tblshared_year_of_initial_pathologic_diagnosis 
 	ON tblshared_year_of_initial_pathologic_diagnosis.tblbrca_patient_id_key 
 	= tblbrca_patient.tblbrca_patient_id_key 
-LEFT OUTER JOIN tblshared_ethnicity 
+LEFT JOIN tblshared_ethnicity 
 	ON tblshared_ethnicity.tblbrca_patient_id_key = tblbrca_patient.tblbrca_patient_id_key
-LEFT OUTER JOIN tblbrca_tcga_bcr 
-	ON tblbrca_patient.tblbrca_tcga_bcr_id_key = tblbrca_tcga_bcr.tblbrca_tcga_bcr_id_key
-LEFT OUTER JOIN tbladmin_admin 
-	ON tbladmin_admin.tblbrca_tcga_bcr_id_key = tblbrca_tcga_bcr.tblbrca_tcga_bcr_id_key
-LEFT OUTER JOIN tbladmin_day_of_dcc_upload 
-	ON tbladmin_day_of_dcc_upload.tbladmin_admin_id_key = tbladmin_admin.tbladmin_admin_id_key
-LEFT OUTER JOIN tbladmin_month_of_dcc_upload 
-	ON tbladmin_month_of_dcc_upload.tbladmin_admin_id_key = tbladmin_admin.tbladmin_admin_id_key
-LEFT OUTER JOIN tbladmin_year_of_dcc_upload 
-	ON tbladmin_year_of_dcc_upload.tbladmin_admin_id_key = tbladmin_admin.tbladmin_admin_id_key;
+LEFT JOIN tblshared_age_at_initial_pathologic_diagnosis
+	ON tblbrca_patient.tblbrca_patient_id_key 
+	= tblshared_age_at_initial_pathologic_diagnosis.tblbrca_patient_id_key
+LEFT JOIN tblshared_vital_status
+	ON tblbrca_patient.tblbrca_patient_id_key 
+	= tblshared_vital_status.tblbrca_patient_id_key
+LEFT JOIN tblshared_days_to_death
+	ON tblbrca_patient.tblbrca_patient_id_key 
+	= tblshared_days_to_death.tblbrca_patient_id_key
 --LIMIT 5
+;

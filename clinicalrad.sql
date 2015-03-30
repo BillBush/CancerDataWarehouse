@@ -1,7 +1,7 @@
-﻿--DROP VIEW vwClinicalRad;
+﻿DROP VIEW vwClinicalRad;
 CREATE OR REPLACE VIEW vwClinicalRad AS 
 SELECT 
-tblshared_bcr_patient_uuid_valuecolumn AS patient_uuid,
+tblshared_bcr_patient_uuid_valuecolumn AS pat_uuid,
 (mainview.form_complete_date + CAST(mainview.tblrad_days_to_radiation_therapy_start_valuecolumn AS INT)) AS rad_therapy_start_date,
 (mainview.form_complete_date + CAST(mainview.tblrad_days_to_radiation_therapy_end_valuecolumn AS INT)) AS rad_therapy_stop_date,
 tblrad_radiation_type_valuecolumn AS rad_type,
