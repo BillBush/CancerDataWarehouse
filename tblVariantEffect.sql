@@ -1,15 +1,11 @@
-﻿DROP TABLE IF EXISTS tblVEPFeatureType;
-DROP SEQUENCE IF EXISTS tblVEPFeatureType_id_seq;
-CREATE SEQUENCE tblVEPFeatureType_id_seq;
-CREATE TABLE tblVEPFeatureType (
-	tblVEPFeatureType_id_Key BIGINT NOT NULL DEFAULT nextval('tblVEPFeatureType_id_seq') PRIMARY KEY,
-	tblVEPFeatureType_Desc VARCHAR
+﻿DROP TABLE IF EXISTS tblVEPEffectConsequence;
+DROP SEQUENCE IF EXISTS tblVEPEffectConsequence_id_seq;
+CREATE SEQUENCE tblVEPEffectConsequence_id_seq;
+CREATE TABLE tblVEPEffectConsequence (
+	tblVEPEffectConsequence_id_Key BIGINT NOT NULL DEFAULT nextval('tblVEPEffectConsequence_id_seq') PRIMARY KEY,
+	tblVEPEffect_id_Key BIGINT NOT NULL,
+	tblVEPConsequence_id_Key BIGINT NOT NULL
 );
-
-INSERT INTO tblVEPFeatureType (tblvepfeaturetype_desc) 
-VALUES 	('Transcript'),
-	('RegulatoryFeature'),
-	('MotifFeature');
 
 DROP TABLE IF EXISTS tblVEPConsequence;
 DROP SEQUENCE IF EXISTS tblVEPConsequence_id_seq;
@@ -55,15 +51,6 @@ VALUES	('transcript_ablation'),
 	('feature_truncation'),
 	('intergenic_variant');
 
-DROP TABLE IF EXISTS tblVEPEffectConsequence;
-DROP SEQUENCE IF EXISTS tblVEPEffectConsequence_id_seq;
-CREATE SEQUENCE tblVEPEffectConsequence_id_seq;
-CREATE TABLE tblVEPEffectConsequence (
-	tblVEPEffectConsequence_id_Key BIGINT NOT NULL DEFAULT nextval('tblVEPEffectConsequence_id_seq') PRIMARY KEY,
-	tblVEPEffect_id_Key BIGINT NOT NULL,
-	tblVEPConsequence_id_Key BIGINT NOT NULL
-);
-
 DROP TABLE IF EXISTS tblVEPEffect;
 DROP SEQUENCE IF EXISTS tblVEPEffect_id_seq;
 CREATE SEQUENCE tblVEPEffect_id_seq;
@@ -84,11 +71,29 @@ CREATE TABLE tblVEPEffect (
 	tblVEPEffect_existing_variation VARCHAR,
 	tblVEPEffect_strand INT,
 	tblVEPEffect_pick INT,
-	tblVEPEffect_sift VARCHAR,
-	tblVEPEffect_polyphen VARCHAR,
-	tblVEPEffect_distance BIGINT
+	tblVEPEffect_sift_desc VARCHAR,
+	tblVEPEffect_sift_score NUMERIC,
+	tblVEPEffect_polyphen_desc VARCHAR,
+	tblVEPEffect_polyphen_score NUMERIC,
+	tblVEPEffect_distance BIGINT,
+	tblVEPEffect_motif_name VARCHAR,
+	tblVEPEffect_motif_position BIGINT,
+	tblVEPEffect_motif_score_change NUMERIC,
+	tblVEPEffect_high_inf_pos VARCHAR
 );
 
+DROP TABLE IF EXISTS tblVEPFeatureType;
+DROP SEQUENCE IF EXISTS tblVEPFeatureType_id_seq;
+CREATE SEQUENCE tblVEPFeatureType_id_seq;
+CREATE TABLE tblVEPFeatureType (
+	tblVEPFeatureType_id_Key BIGINT NOT NULL DEFAULT nextval('tblVEPFeatureType_id_seq') PRIMARY KEY,
+	tblVEPFeatureType_Desc VARCHAR
+);
+
+INSERT INTO tblVEPFeatureType (tblvepfeaturetype_desc) 
+VALUES 	('Transcript'),
+	('RegulatoryFeature'),
+	('MotifFeature');
 ALTER TABLE tblVEPEffect
 ADD CONSTRAINT fk_tblVEPEffect_tblVEPFeatureType
 FOREIGN KEY (tblVEPFeatureType_id_Key)

@@ -1,0 +1,40 @@
+#!/bin/bash
+
+eof="thisistheenddamnit"
+> ~/tmp.txt
+
+select="SELECT tblmutation.id_key, chromosome, startpos, startpos, (refbases || '/' || altbases) AS snp, '-' AS strand "
+from="FROM tblmutation JOIN tblaltbases ON tblaltbases.tblMutation_id_key = tblmutation.id_key JOIN vwpatientsamplemutation ON vwpatientsamplemutation.mutation_set_uuid = tblmutation.dldir "
+#where="WHERE muttype = 1 "
+where=""
+limit="LIMIT 1000"
+semicolon=";"
+
+
+#psql -d "cancer_work" -h "127.0.0.1" -p "5432" -U "postgres" -t -c "$select $from $where $limit $semicolon"
+#exit 0
+
+for rec in $(psql -d "cancer_work" -h "127.0.0.1" -p "5432" -U "postgres" -t -c "$select $from $where $limit $semicolon" | sed "s/[ ]//g")
+do
+  id=$(echo $rec | sed "s/\([^|][^|]*\)|.*/\1/")
+  rec=$(echo $rec | sed "s/[^|][^|]*|//")
+  rec=$(echo $rec | /usr/lib/jvm/jdk1.7.0_72/bin/java -jar "/home/bill/NetBeansProjects/VepFormatter/dist/VepFormatter.jar")
+
+  echo $rec | sed "s/|/ /g" | /home/bill/Downloads/ensembl-tools-release-78/scripts/variant_effect_predictor/variant_effect_predictor.pl --species homo_sapiens --output_file STDOUT --database --no_stats --sift b --polyphen b --regulatory --pick_order "tsl,biotype,rank,canonical,length" --flag_pick --assembly GRCh37 --cache -dir "/mnt/mainlv/.vep/" --offline
+  echo ""
+  echo $rec | sed "s/|/ /g" | /home/bill/Downloads/ensembl-tools-release-78/scripts/variant_effect_predictor/variant_effect_predictor.pl --species homo_sapiens --output_file STDOUT --database --no_stats --sift b --polyphen b --regulatory --pick_order "tsl,biotype,rank,canonical,length" --flag_pick --assembly GRCh37 --cache -dir "/mnt/mainlv/.vep/" --offline | /usr/lib/jvm/jdk1.7.0_72/bin/java -jar "/home/bill/NetBeansProjects/GenomeAnnotator/dist/GenomeAnnotator.jar" -mut_id $id
+  if [ $? -ne 0 ]
+  then
+    exit 0
+  fi
+  echo ""
+  echo ""
+  echo ""
+
+#  echo $rec | sed "s/|/ /g" | /home/bill/Downloads/ensembl-tools-release-78/scripts/variant_effect_predictor/variant_effect_predictor.pl --species homo_sapiens --output_file STDOUT --database --no_stats --sift b --polyphen b --regulatory --pick_order "tsl,biotype,rank,canonical,length" --flag_pick --assembly GRCh37 --cache -dir "/mnt/mainlv/.vep/" --offline | /usr/lib/jvm/jdk1.7.0_72/bin/java -jar "/home/bill/NetBeansProjects/GenomeAnnotator/dist/GenomeAnnotator.jar" -mut_id $id
+
+#  output=$(echo $rec | sed "s/|/ /g" | /home/bill/Downloads/ensembl-tools-release-78/scripts/variant_effect_predictor/variant_effect_predictor.pl --species homo_sapiens --output_file STDOUT --database --no_stats --sift b --polyphen b --regulatory --pick_order "tsl,biotype,rank,canonical,length" --flag_pick --assembly GRCh37 --cache -dir "/mnt/mainlv/.vep/" --offline)
+#  echo $output$eof >> ~/tmp.txt
+done
+
+exit 0
