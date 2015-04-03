@@ -82,7 +82,8 @@ CREATE TABLE tblVEPEffect (
 	tblVEPEffect_motif_name VARCHAR,
 	tblVEPEffect_motif_position BIGINT,
 	tblVEPEffect_motif_score_change NUMERIC,
-	tblVEPEffect_high_inf_pos VARCHAR
+	tblVEPEffect_high_inf_pos VARCHAR,
+	tblVEPEffect_biotype VARCHAR
 );
 
 DROP TABLE IF EXISTS tblVEPFeatureType;
